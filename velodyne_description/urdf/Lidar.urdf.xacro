@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="LIDAR">
-  <xacro:macro name="Lidar" params="*origin parent:=base_link name:=lidar topic:=/scan organize_cloud:=false hz:=10 lasers:=16 samples:=1875 collision_range:=0.3 min_range:=0.9 max_range:=130.0 noise:=0.008 min_horizonal_angle:=${radians(-180)} max_horizonal_angle:=${radians(180)} min_vertical_angle:=${radians(-15.0)} max_vertical_angle:=${radians(15.0)} gpu:=false">
+  <xacro:macro name="Lidar" params="*origin parent:=base_link name:=lidar topic:=/scan organize_cloud:=false hz:=10 lasers:=16 samples:=1875 collision_range:=0.3 min_range:=0.9 max_range:=150.0 noise:=0.008 min_horizonal_angle:=${radians(-180)} max_horizonal_angle:=${radians(180)} min_vertical_angle:=${radians(-15.0)} max_vertical_angle:=${radians(15.0)} gpu:=false">
 
     <joint name="${name}_base_mount_joint" type="fixed">
       <xacro:insert_block name="origin" /> 

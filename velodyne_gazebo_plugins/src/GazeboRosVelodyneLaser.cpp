@@ -277,6 +277,7 @@ void GazeboRosVelodyneLaser::OnScan(ConstLaserScanStampedPtr& _msg)
 
   // Populate message fields
   const uint32_t POINT_STEP = 22;
+
   sensor_msgs::PointCloud2 msg;
   msg.header.frame_id = frame_name_;
   msg.header.stamp = ros::Time(_msg->time().sec(), _msg->time().nsec());
@@ -297,21 +298,20 @@ void GazeboRosVelodyneLaser::OnScan(ConstLaserScanStampedPtr& _msg)
   msg.fields[3].offset = 12;
   msg.fields[3].datatype = sensor_msgs::PointField::FLOAT32;
   msg.fields[3].count = 1;
-  msg.fields[4].name = "ring";
+  msg.fields[4].name = "time";
   msg.fields[4].offset = 16;
-  msg.fields[4].datatype = sensor_msgs::PointField::UINT16;
+  msg.fields[4].datatype = sensor_msgs::PointField::FLOAT32;
   msg.fields[4].count = 1;
-  msg.fields[5].name = "time";
-  msg.fields[5].offset = 18;
-  msg.fields[5].datatype = sensor_msgs::PointField::FLOAT32;
+  msg.fields[5].name = "ring";
+  msg.fields[5].offset = 20;
+  msg.fields[5].datatype = sensor_msgs::PointField::UINT16;
   msg.fields[5].count = 1;
   msg.data.resize(verticalRangeCount * rangeCount * POINT_STEP);
 
-  int i, j;
+  uint16_t i, j;
   uint8_t *ptr = msg.data.data();
   for (i = 0; i < rangeCount; i++) {
     for (j = 0; j < verticalRangeCount; j++) {
-
       // Range
       double r = _msg->scan().ranges(i + j * rangeCount);
       // Intensity
@@ -351,16 +351,16 @@ void GazeboRosVelodyneLaser::OnScan(ConstLaserScanStampedPtr& _msg)
         *((float*)(ptr + 4)) = r * cos(pAngle) * sin(yAngle); // y
         *((float*)(ptr + 8)) = r * sin(pAngle); // z
         *((float*)(ptr + 12)) = intensity; // intensity
-        *((uint16_t*)(ptr + 16)) = j; // ring
-        *((float*)(ptr + 18)) = 0.0; // time
+        *((float*)(ptr + 16)) = 0.0; // time
+        *((uint16_t*)(ptr + 20)) = j; // ring
         ptr += POINT_STEP;
       } else if (organize_cloud_) {
         *((float*)(ptr + 0)) = nanf(""); // x
         *((float*)(ptr + 4)) = nanf(""); // y
         *((float*)(ptr + 8)) = nanf(""); // x
         *((float*)(ptr + 12)) = nanf(""); // intensity
-        *((uint16_t*)(ptr + 16)) = j; // ring
-        *((float*)(ptr + 18)) = 0.0; // time
+        *((float*)(ptr + 16)) = 0.0; // time
+        *((uint16_t*)(ptr + 20)) = j; // ring
         ptr += POINT_STEP;
       }
     }
@@ -368,6 +368,7 @@ void GazeboRosVelodyneLaser::OnScan(ConstLaserScanStampedPtr& _msg)
 
   // Populate message with number of valid points
   msg.data.resize(ptr - msg.data.data()); // Shrink to actual size
+
   msg.point_step = POINT_STEP;
   msg.is_bigendian = false;
   if (organize_cloud_) {
